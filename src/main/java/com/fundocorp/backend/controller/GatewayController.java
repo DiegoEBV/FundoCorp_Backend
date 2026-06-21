@@ -55,6 +55,6 @@ public class GatewayController {
                     gatewayService.deleteById(id);
                     return ResponseEntity.<Void>noContent().build();
                 })
-                .orElse(ResponseEntity.notFound().build());
+                .orElse(ResponseEntity.<Void>notFound().build());
     }
 }

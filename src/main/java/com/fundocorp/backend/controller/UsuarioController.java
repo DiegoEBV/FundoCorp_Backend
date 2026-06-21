@@ -55,7 +55,7 @@ public class UsuarioController {
                     usuarioService.deleteById(id);
                     return ResponseEntity.<Void>noContent().build();
                 })
-                .orElse(ResponseEntity.notFound().build());
+                .orElse(ResponseEntity.<Void>notFound().build());
     }
 
     @GetMapping("/fundo/{idFundo}")
