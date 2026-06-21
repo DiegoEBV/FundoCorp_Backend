@@ -50,11 +50,8 @@ public class GatewayController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Integer id) {
-        return gatewayService.findById(id)
-                .map(g -> {
-                    gatewayService.deleteById(id);
-                    return ResponseEntity.<Void>noContent().build();
-                })
-                .orElse(ResponseEntity.<Void>notFound().build());
+        if (gatewayService.findById(id).isEmpty()) return ResponseEntity.notFound().build();
+        gatewayService.deleteById(id);
+        return ResponseEntity.noContent().build();
     }
 }
