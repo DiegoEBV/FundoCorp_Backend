@@ -50,12 +50,9 @@ public class UsuarioController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Integer id) {
-        return usuarioService.findById(id)
-                .map(u -> {
-                    usuarioService.deleteById(id);
-                    return ResponseEntity.<Void>noContent().build();
-                })
-                .orElse(ResponseEntity.notFound().build());
+        if (usuarioService.findById(id).isEmpty()) return ResponseEntity.notFound().build();
+        usuarioService.deleteById(id);
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/fundo/{idFundo}")
