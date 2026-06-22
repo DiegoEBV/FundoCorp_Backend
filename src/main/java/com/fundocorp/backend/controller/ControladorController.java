@@ -50,11 +50,8 @@ public class ControladorController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Integer id) {
-        return controladorService.findById(id)
-                .map(c -> {
-                    controladorService.deleteById(id);
-                    return ResponseEntity.<Void>noContent().build();
-                })
-                .orElse(ResponseEntity.notFound().build());
+        if (controladorService.findById(id).isEmpty()) return ResponseEntity.notFound().build();
+        controladorService.deleteById(id);
+        return ResponseEntity.noContent().build();
     }
 }
