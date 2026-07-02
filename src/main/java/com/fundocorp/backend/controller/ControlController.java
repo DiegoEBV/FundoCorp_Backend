@@ -9,8 +9,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Map;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/control")
@@ -24,20 +26,21 @@ public class ControlController {
     public ResponseEntity<Map<String, String>> cambiarValvula(@RequestBody ValveCommand command) {
         return controladorService.findById(command.getIdControlador())
                 .map(ctrl -> {
-                    LecturaSensor ultima = lecturaSensorService
-                            .findLastByControlador(command.getIdControlador())
-                            .orElse(new LecturaSensor());
+                    // Si el controlador aún no tiene ninguna lectura (recién creado), se usan 0
+                    // como valores base en vez de null, para que el frontend pueda graficarlos.
+                    Optional<LecturaSensor> ultima = lecturaSensorService
+                            .findLastByControlador(command.getIdControlador());
 
                     LecturaSensor nueva = new LecturaSensor();
                     nueva.setIdControlador(command.getIdControlador());
                     nueva.setValvula(command.getAbrir());
-                    nueva.setHumedad(ultima.getHumedad());
-                    nueva.setHumedad30(ultima.getHumedad30());
-                    nueva.setHumedad60(ultima.getHumedad60());
-                    nueva.setHumedad90(ultima.getHumedad90());
-                    nueva.setRadiacion(ultima.getRadiacion());
-                    nueva.setConductividad(ultima.getConductividad());
-                    nueva.setTemperatura(ultima.getTemperatura());
+                    nueva.setHumedad(ultima.map(LecturaSensor::getHumedad).orElse(BigDecimal.ZERO));
+                    nueva.setHumedad30(ultima.map(LecturaSensor::getHumedad30).orElse(BigDecimal.ZERO));
+                    nueva.setHumedad60(ultima.map(LecturaSensor::getHumedad60).orElse(BigDecimal.ZERO));
+                    nueva.setHumedad90(ultima.map(LecturaSensor::getHumedad90).orElse(BigDecimal.ZERO));
+                    nueva.setRadiacion(ultima.map(LecturaSensor::getRadiacion).orElse(BigDecimal.ZERO));
+                    nueva.setConductividad(ultima.map(LecturaSensor::getConductividad).orElse(BigDecimal.ZERO));
+                    nueva.setTemperatura(ultima.map(LecturaSensor::getTemperatura).orElse(BigDecimal.ZERO));
                     nueva.setFechaHora(LocalDateTime.now());
                     lecturaSensorService.save(nueva);
 
