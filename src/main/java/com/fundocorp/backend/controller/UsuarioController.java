@@ -55,6 +55,11 @@ public class UsuarioController {
         return ResponseEntity.noContent().build();
     }
 
+    @GetMapping("/asignaciones")
+    public List<UsuarioFundo> getAllAsignaciones() {
+        return usuarioFundoRepository.findAll();
+    }
+
     @GetMapping("/fundo/{idFundo}")
     public List<UsuarioFundo> getByFundo(@PathVariable Integer idFundo) {
         return usuarioFundoRepository.findByFundoId(idFundo);
