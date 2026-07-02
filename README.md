@@ -158,20 +158,36 @@ Al iniciar por primera vez, el sistema inserta automáticamente datos de prueba 
 
 ## 6. Conectar con el frontend Angular
 
-El backend ya tiene CORS configurado para `http://localhost:4200`.
-
-En los servicios Angular del proyecto **FundoCorp**, descomenta las llamadas HTTP reales y comenta los mocks. Por ejemplo en `auth.service.ts`:
-
-```typescript
-// Descomentar esta línea:
-return this.http.post<Usuario>(`${this.apiUrl}/login`, { correo, contrasena });
-
-// Comentar el bloque de simulación mock
-```
+El backend ya tiene CORS configurado para `http://localhost:4200` y para cualquier subdominio de
+`https://*.netlify.app` (ver `cors.allowed-origins` en `application.properties` / variable de entorno
+`CORS_ALLOWED_ORIGINS`). Los servicios Angular del proyecto **FundoCorp** ya consumen estos endpoints
+mediante `HttpClient`, apuntando a la URL configurada en `src/environments/environment.ts`
+(desarrollo) y `environment.prod.ts` (producción).
 
 ---
 
-## 7. Estructura del proyecto
+## 7. Despliegue en Render
+
+1. Sube este repositorio a GitHub (ya incluye `Dockerfile` y `render.yaml`).
+2. En Render, crea un **Blueprint** (`New +` → `Blueprint`) apuntando al repo, o crea un **Web Service**
+   manual con *Runtime: Docker*.
+3. Configura las variables de entorno del servicio:
+
+   | Variable | Descripción |
+   |----------|--------------|
+   | `DB_URL` | Cadena JDBC de tu MySQL accesible desde internet (Render no ofrece MySQL administrado; usa un proveedor externo como Railway, Aiven o PlanetScale) |
+   | `DB_USERNAME` | Usuario de la base de datos |
+   | `DB_PASSWORD` | Contraseña de la base de datos |
+   | `CORS_ALLOWED_ORIGINS` | Orígenes permitidos, p. ej. `https://tu-app.netlify.app,http://localhost:4200` |
+
+   Render inyecta automáticamente la variable `PORT`; `application.properties` ya la usa (`server.port=${PORT:8080}`).
+4. Despliega. La URL pública será algo como `https://fundocorp-backend.onrender.com`.
+5. Actualiza `src/environments/environment.prod.ts` en el frontend con esa URL + `/api` y vuelve a
+   desplegar en Netlify.
+
+---
+
+## 8. Estructura del proyecto
 
 ```
 src/main/java/com/fundocorp/backend/
@@ -187,7 +203,7 @@ src/main/java/com/fundocorp/backend/
 
 ---
 
-## 8. Tecnologías
+## 9. Tecnologías
 
 - **Spring Boot 3.3** — Framework principal
 - **Spring Data JPA + Hibernate** — Persistencia
